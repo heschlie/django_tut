@@ -1,0 +1,41 @@
+{% load staticfiles %}
+<script src="{% static 'polls/jquery.js' %}"></script>
+<script src="{% static 'polls/tablesorter/jquery.tablesorter.js' %}"></script>
+<script src="{% static 'polls/tablesorter/parsers/parser-network.js' %}"></script>
+
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}" />
+
+<script type="text/javascript">
+    $(document).ready(function()
+    {
+        $("#t1").tablesorter();
+    })
+</script>
+
+<h1>TestShell</h1>
+<table style="width: 100%" id="t1" class="tablesorter">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th class="{ sorter: 'ipv4Address' }">IP</th>
+            <th>Rack</th>
+            <th>Console</th>
+            <th>Console Port</th>
+            <th>CDU</th>
+            <th>CDU Port</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for device in devices %}
+        <tr>
+        <td>{{ device.name }}</td>
+        <td>{{ device.address }}</td>
+        <td>{{ device.rack }}</td>
+        <td>{{ device.console }}</td>
+        <td>{{ device.console_port }}</td>
+        <td>{{ device.pdu }}</td>
+        <td>{{ device.pdu_port }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>

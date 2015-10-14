@@ -2,6 +2,8 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.views import generic
+from django.utils import timezone
+from tsapi import TestShellApi, TestShellError
 
 from .models import Question, Choice
 
@@ -12,7 +14,8 @@ class IndexView(generic.ListView):
     context_object_name = 'latest_question_list'
 
     def get_queryset(self):
-        return Question.objects.order_by('-pub_date')[:5]
+        return Question.objects.filter(
+            pub_date__lte=timezone.now()).order_by('-pub_date')[:5]
 
 
 class DetailView(generic.DetailView):
@@ -23,6 +26,20 @@ class DetailView(generic.DetailView):
 class ResultsView(generic.DetailView):
     model = Question
     template_name = 'polls/results.html'
+
+
+def test_shell(request, term):
+    ts = TestShellApi()
+    ts.logon()
+    try:
+        devices = ts.get_resources_details(
+            ts.find_resources(term, showAllDomains=True))
+
+        return render(request, 'polls/testshell.html', {
+            'devices': devices,
+        })
+    except TestShellError:
+        raise Http404('{} not found in QualiSystems'.format(term))
 
 
 def vote(request, question_id):
